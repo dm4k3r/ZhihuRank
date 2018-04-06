@@ -78,9 +78,8 @@ class MongoSnapshotPipeline(object):
     def process_item(self, item, spider):
         if isinstance(item, ZhihuUserSnapshotItem):
             collection_name = "user"
-        item=dict(item)
         today_datetime = datetime.now().strftime('%Y-%m-%d')
-        user_updatetime = self.db[collection_name].find({'url_token': item['url_token']})[0]['crawl_update_time']
+        user_updatetime = self.db[collection_name].find_one({'url_token': item.get('url_token')}).get('crawl_update_time')
         if today_datetime != user_updatetime:
             self.db[collection_name].update({'url_token': item['url_token']},
                                             {'$push':
@@ -93,6 +92,7 @@ class MongoSnapshotPipeline(object):
                                                  'question_count': item['question_count'],
                                                  'articles_count': item['articles_count'],
                                                  'thanked_count': item['thanked_count'],
+                                                 'voteup_count': item['voteup_count'],
                                                  'following_topic_count': item['following_topic_count'],
                                                  'following_columns_count': item['following_columns_count'],
                                                  'columns_count': item['columns_count'],

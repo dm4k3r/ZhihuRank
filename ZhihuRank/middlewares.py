@@ -8,7 +8,7 @@
 from scrapy import signals
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
 from fake_useragent import UserAgent
-from ZhihuRank.cookieredis import init_cookie
+from ZhihuRank.utils.cookie_redis import init_cookie
 import redis
 import random
 import json
@@ -24,7 +24,7 @@ class CookieMiddleware(RetryMiddleware):
     def __init__(self, settings, crawler):
         RetryMiddleware.__init__(self, settings)
         self.rcoon = redis.from_url(settings['REDIS_URL'], db=1, decode_responses=True)
-        # init_cookie(crawler.spider.name)
+        init_cookie(crawler.spider.name)
 
 
     @classmethod

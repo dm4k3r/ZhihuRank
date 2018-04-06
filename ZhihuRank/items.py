@@ -25,6 +25,8 @@ class ZhihuUserItem(scrapy.Item):
     id = scrapy.Field()
     # 昵称
     name = scrapy.Field()
+    # 头像
+    avatar_url = scrapy.Field()
     # url_token用户标识
     url_token = scrapy.Field()
     # 性别
@@ -67,7 +69,6 @@ class ZhihuUserItem(scrapy.Item):
     locations = scrapy.Field()
     # 关注问题数量
     following_question_count = scrapy.Field(output_processor=MapCompose(dont_do_anything))
-    #
     # 简介
     description = scrapy.Field()
     # 说说
@@ -88,6 +89,8 @@ class ZhihuUserSnapshotItem(scrapy.Item):
     id = scrapy.Field()
     # 昵称
     name = scrapy.Field()
+    # 头像
+    avatar_url = scrapy.Field()
     # url_token用户标识
     url_token = scrapy.Field()
     # 性别
@@ -130,7 +133,6 @@ class ZhihuUserSnapshotItem(scrapy.Item):
     locations = scrapy.Field()
     # 关注问题数量
     following_question_count = scrapy.Field()
-    #
     # 简介
     description = scrapy.Field()
     # 说说

@@ -10,8 +10,18 @@ class MySpider(RedisSpider):
     """Spider that reads urls from redis queue (myspider:start_urls)."""
     name = 'user'
     redis_key = 'user:start_urls'
+    allowed_domains = 'zhihu.com'
     custom_settings = {
-        'DOWNLOAD_DELAY': 1
+        'DOWNLOAD_DELAY': 1,
+        'DOWNLOADER_MIDDLEWARES': {
+            'ZhihuRank.middlewares.CookieMiddleware': 543,
+            'ZhihuRank.middlewares.SetUserAgentMiddleware': 550,
+            'ZhihuRank.middlewares.RandomUserAgentMiddleware': 560,
+        },
+        'ITEM_PIPELINES': {
+            'ZhihuRank.pipelines.DropItemPipeline': 300,
+            'ZhihuRank.pipelines.MongoPipeline': 310,
+        }
     }
 
     user_url = 'https://www.zhihu.com/api/v4/members/{url_token}?include={include}'
@@ -34,13 +44,6 @@ class MySpider(RedisSpider):
     followers_url = 'https://www.zhihu.com/api/v4/members/{url_token}/followees?include={include}&offset=0&limit=20'
     followers_query = 'data[*].answer_count,articles_count,gender,follower_count,is_followed,is_following,' \
                       'badge'
-
-    def __init__(self, *args, **kwargs):
-        # Dynamically define the allowed domains list.
-        domain = kwargs.pop('domain', '')
-        self.allowed_domains = filter(None, domain.split(','))
-        super(MySpider, self).__init__(*args, **kwargs)
-
 
     def parse(self, response):
         url_token = response.url.split('/')[-2]
@@ -73,16 +76,27 @@ class MySpider(RedisSpider):
             yield scrapy.Request(url=next_page, callback=self.parse_followers, dont_filter=True)
 
     def parse_user(self, response):
+        url_token = response.meta.get('url_token')
         user_content = json.loads(response.text)
         user_item = ZhihuUserItemLoader(item=ZhihuUserItem(), response=response)
         for field in user_item.item.fields:
             if field in user_content.keys():
                 if 'count' in field:
                     user_item.add_value(field, {datetime.now().strftime('%Y-%m-%d'): user_content.get(field)})
+                elif 'locations' == field or 'business' == field:
+                    content = user_content.get(field)
+                    if isinstance(content, list) and len(content) > 0:
+                        content = content[0]
+                        user_item.add_value(field, content.get('name', ''))
+                    if isinstance(content, dict):
+                        user_item.add_value(field, content.get('name', ''))
                 else:
                     user_item.add_value(field, user_content.get(field))
         user_item.add_value('crawl_created_time', datetime.now().strftime('%Y-%m-%d'))
         user_item.add_value('crawl_update_time', datetime.now().strftime('%Y-%m-%d'))
+        yield scrapy.Request(url='https://www.zhihu.com/people/{}/activities'.format(url_token),
+                             callback=self.parse,
+                             dont_filter=True)
         yield user_item.load_item()
 
 

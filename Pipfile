@@ -1,12 +1,9 @@
 [[source]]
-
 verify_ssl = true
 url = "https://pypi.douban.com/simple"
 name = "pypi"
 
-
 [packages]
-
 scrapy = "*"
 request = "*"
 requests = "*"
@@ -17,11 +14,7 @@ pillow = "*"
 fake-useragent = "*"
 requests-toolbelt = "*"
 
-
 [requires]
-
 python_version = "3.5"
 
-
 [dev-packages]
-

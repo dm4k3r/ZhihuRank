@@ -23,11 +23,11 @@ ROBOTSTXT_OBEY = False
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
-DOWNLOADER_MIDDLEWARES = {
-   'ZhihuRank.middlewares.CookieMiddleware': 543,
-   'ZhihuRank.middlewares.SetUserAgentMiddleware': 550,
-   'ZhihuRank.middlewares.RandomUserAgentMiddleware': 560,
-}
+# DOWNLOADER_MIDDLEWARES = {
+#    'ZhihuRank.middlewares.CookieMiddleware': 543,
+#    'ZhihuRank.middlewares.SetUserAgentMiddleware': 550,
+#    'ZhihuRank.middlewares.RandomUserAgentMiddleware': 560,
+# }
 
 # SCHEDULER_FLUSH_ON_START = True
 
@@ -76,10 +76,10 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-   'ZhihuRank.pipelines.DropItemPipeline': 300,
-   'ZhihuRank.pipelines.MongoPipeline': 310,
-}
+# ITEM_PIPELINES = {
+#    'ZhihuRank.pipelines.DropItemPipeline': 300,
+#    'ZhihuRank.pipelines.MongoPipeline': 310,
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
