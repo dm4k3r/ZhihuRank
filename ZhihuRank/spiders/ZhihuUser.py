@@ -58,7 +58,7 @@ class MySpider(RedisSpider):
             for user in following_content.get('data'):
                 url_token = user.get('url_token')
                 yield scrapy.Request(url=self.user_url.format(url_token=url_token, include=self.user_query),
-                                     callback=self.parse_user, dont_filter=True)
+                                     callback=self.parse_user, dont_filter=True, meta={'url_token': url_token})
         if 'paging' in following_content.keys() and following_content.get('paging').get('is_end') == False:
             next_page = following_content.get('paging').get('next')
             yield scrapy.Request(url=next_page, callback=self.parse_following, dont_filter=True)
@@ -70,7 +70,7 @@ class MySpider(RedisSpider):
             for user in followers_content.get('data'):
                 url_token = user.get('url_token')
                 yield scrapy.Request(url=self.user_url.format(url_token=url_token, include=self.user_query),
-                                     callback=self.parse_user, dont_filter=True)
+                                     callback=self.parse_user, dont_filter=True, meta={'url_token': url_token})
         if 'paging' in followers_content.keys() and followers_content.get('paging').get('is_end') == False:
             next_page = followers_content.get('paging').get('next')
             yield scrapy.Request(url=next_page, callback=self.parse_followers, dont_filter=True)

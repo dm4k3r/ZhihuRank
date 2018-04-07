@@ -198,7 +198,7 @@ def init_cookie(spidername):
     # 初始化cookie池
     redkeys = reds.keys()
     for user in redkeys:
-        if spidername not in user:
+        if 'user' not in user:
             password = reds.get(user)
             if reds.exists("{}:Cookies:{}--{}".format(spidername, user, password)) == False:
                 cookie = ZhihuUserCookies(user, password).main()

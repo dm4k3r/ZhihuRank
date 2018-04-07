@@ -35,7 +35,7 @@ class CookieMiddleware(RetryMiddleware):
         redisKeys = self.rcoon.keys()
         while len(redisKeys) > 0:
             elem = random.choice(redisKeys)
-            if spider.name + ':Cookies' in elem:
+            if 'user' + ':Cookies' in elem:
                 cookie = json.loads(self.rcoon.get(elem))
                 logger.info('使用帐号: {}进行抓取'.format(elem))
                 request.cookies = cookie
