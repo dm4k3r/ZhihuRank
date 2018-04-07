@@ -78,8 +78,7 @@ class MySpider(RedisSpider):
                 else:
                     user_item.add_value(field, user_content.get(field))
         user_item.add_value('crawl_created_time', datetime.now().strftime('%Y-%m-%d'))
-        # user_item.add_value('crawl_update_time', datetime.now().strftime('%Y-%m-%d'))
-        user_item.add_value('crawl_update_time', '2018-04-07')
+        user_item.add_value('crawl_update_time', datetime.now().strftime('%Y-%m-%d'))
         url_token = self.reds.lpop('url_token')
         yield scrapy.Request(url='https://www.zhihu.com/people/{}/activities'.format(url_token), dont_filter=True,
                              callback=self.parse)
