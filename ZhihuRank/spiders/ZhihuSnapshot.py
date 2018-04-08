@@ -16,8 +16,6 @@ class MySpider(RedisSpider):
     custom_settings = {
         'DOWNLOAD_DELAY': 1,
         'DOWNLOADER_MIDDLEWARES': {
-            'ZhihuRank.middlewares.CookieMiddleware': 543,
-            'ZhihuRank.middlewares.SetUserAgentMiddleware': 550,
             'ZhihuRank.middlewares.RandomUserAgentMiddleware': 560,
         },
         'ITEM_PIPELINES': {
