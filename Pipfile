@@ -13,6 +13,7 @@ scrapy-redis = "*"
 pillow = "*"
 fake-useragent = "*"
 requests-toolbelt = "*"
+twisted = "==16.5"
 
 [requires]
 python_version = "3.5"

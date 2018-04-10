@@ -8,9 +8,60 @@ import pymongo
 from ZhihuRank.items import ZhihuUserItem, ZhihuUserSnapshotItem
 from datetime import datetime
 from scrapy.exceptions import DropItem
+from ZhihuRank.settings import REDIS_URL
 import logging
+import redis
 
 logger = logging.getLogger(__name__)
+
+class InserRedis(object):
+    def __init__(self, mongo_uri, mongo_db):
+        self.reds = redis.Redis.from_url(REDIS_URL, db=2, decode_responses=True)
+        self.coon = pymongo.MongoClient(mongo_uri)
+        self.db = self.coon[mongo_db]
+        # 初始化已抓url_token队列
+        if self.reds.hlen('url_token') == 0:
+            collection = self.db['user']
+            for i in collection.find({}, {'_id': 0, 'url_token': 1}):
+                logger.info('wrire to redis: ' + i['url_token'])
+                self.reds.hset('url_token', i['url_token'], 0)
+            logger.info("初始化url_token完毕")
+            self.coon.close()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri=crawler.settings.get('MONGO_URI'),
+            mongo_db=crawler.settings.get('MONGO_DATABASE', 'items'),
+        )
+
+    def process_item(self, item, spider):
+        self.reds.hset('url_token', item['url_token'], 0)
+        return item
+
+class PushRedis(object):
+    def __init__(self, mongo_uri, mongo_db):
+        self.reds = redis.Redis.from_url(REDIS_URL, db=3, decode_responses=True)
+        self.coon = pymongo.MongoClient(mongo_uri)
+        self.db = self.coon[mongo_db]
+        # 初始化已抓url_token队列
+        if self.reds.llen('url_token') == 0:
+            collection = self.db['user']
+            for i in collection.find({}, {'_id': 0, 'url_token': 1}):
+                self.reds.lupsh('url_token', i['url_token'])
+            logger.info("初始化url_token完毕")
+            self.coon.close()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri=crawler.settings.get('MONGO_URI'),
+            mongo_db=crawler.settings.get('MONGO_DATABASE', 'items'),
+        )
+
+    def process_item(self, item, spider):
+        return item
+
 
 class DropItemPipeline(object):
     """
@@ -20,7 +71,7 @@ class DropItemPipeline(object):
         follower_count = 0
         for i in item['follower_count'][0].keys():
             follower_count = item['follower_count'][0].get(i)
-        if follower_count <= 500:
+        if follower_count <= 100:
             raise DropItem("该号被关注人数过低: {0}".format(item['url_token']))
         return item
 
@@ -53,6 +104,7 @@ class MongoPipeline(object):
             return item
         except IndexError:
             self.db[collection_name].insert_one(dict(item))
+            logger.info("正在写入:{}".format(item['url_token']))
             return item
 
 
@@ -102,7 +154,12 @@ class MongoSnapshotPipeline(object):
                                                  'following_question_count': item['following_question_count'],
                                                  },
                                              '$set':
-                                             {'crawl_update_time': item['crawl_update_time']}})
+                                             {'crawl_update_time': item['crawl_update_time'],
+                                              'description': item['description'],
+                                              'headline': item['headline'],
+                                              'educations': item['educations'],
+                                              'employments': item['employments'],
+                                              'business': item['business']}})
         else:
             logger.info('{}已更新今日记录'.format(item['url_token']))
         return item

@@ -3,7 +3,6 @@ import scrapy
 import json
 from datetime import datetime
 from ZhihuRank.items import ZhihuUserItem, ZhihuUserItemLoader
-from scrapy.loader import ItemLoader
 
 
 class MySpider(RedisSpider):
@@ -12,13 +11,19 @@ class MySpider(RedisSpider):
     redis_key = 'user:start_urls'
     allowed_domains = 'zhihu.com'
     custom_settings = {
-        'DOWNLOAD_DELAY': 1,
+        'DOWNLOAD_DELAY': 2,
+        'CONCURRENT_REQUESTS': 32,
+        'RETRY_ENABLED': False,
         'DOWNLOADER_MIDDLEWARES': {
-            'ZhihuRank.middlewares.RandomUserAgentMiddleware': 560,
+            # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,
+            # 'ZhihuRank.middlewares.HttpProxyMiddleware': 460,
+            'ZhihuRank.middlewares.IngoreRequestMiddleware': 480,
+            'ZhihuRank.middlewares.RandomUserAgentMiddleware': 500,
         },
         'ITEM_PIPELINES': {
-            'ZhihuRank.pipelines.DropItemPipeline': 300,
-            'ZhihuRank.pipelines.MongoPipeline': 310,
+            'ZhihuRank.pipelines.DropItemPipeline': 310,
+            'ZhihuRank.pipelines.InserRedis': 300,
+            'ZhihuRank.pipelines.MongoPipeline': 320,
         }
     }
 
@@ -95,6 +100,7 @@ class MySpider(RedisSpider):
         yield scrapy.Request(url='https://www.zhihu.com/people/{}/activities'.format(url_token),
                              callback=self.parse,
                              dont_filter=True)
+
         yield user_item.load_item()
 
 

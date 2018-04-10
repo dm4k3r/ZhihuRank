@@ -22,6 +22,7 @@ NEWSPIDER_MODULE = 'ZhihuRank.spiders'
 ROBOTSTXT_OBEY = False
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+DOWNLOAD_TIMEOUT = 30
 
 # DOWNLOADER_MIDDLEWARES = {
 #    'ZhihuRank.middlewares.CookieMiddleware': 543,
@@ -36,7 +37,7 @@ DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 # }
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 48
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -57,7 +58,7 @@ DEFAULT_REQUEST_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
     'authorization': 'oauth c3cef7c66a1843f8b3a9e6a1e3160e20'
 }
-
+LOG_LEVEL = 'INFO'
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
@@ -103,14 +104,15 @@ DEFAULT_REQUEST_HEADERS = {
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # redis 设置
-REDIS_URL = 'redis://root@127.0.0.1:6379'
+REDIS_URL = 'redis://root@35.229.240.163:6379'
 # REDIS_HOST = '127.0.0.1'
 # REDIS_PORT = 6379
 
 #mongodb 设置
-MONGO_URI = '127.0.0.1'
+MONGO_URI = '35.229.240.163'
 MONGO_DATABASE = 'zhihu'
 
 # 其他设置
 USERAGENT_TYPE = 'chrome'
+PROXY_REQUEST_API = 'http://api.xdaili.cn/xdaili-api//privateProxy/applyStaticProxy?spiderId=fb8a63a171b44c6081cbc5a4bed5f50e&returnType=2&count=5'
 

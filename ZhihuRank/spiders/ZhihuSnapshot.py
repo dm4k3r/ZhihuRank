@@ -12,20 +12,20 @@ class MySpider(RedisSpider):
     """Spider that reads urls from redis queue (myspider:start_urls)."""
     name = 'snapshot'
     redis_key = 'snapshot:start_urls'
-    allowed_domains = 'zhihu.com'
+    allowed_domains = ['zhihu.com']
     custom_settings = {
         'DOWNLOAD_DELAY': 1,
         'DOWNLOADER_MIDDLEWARES': {
             'ZhihuRank.middlewares.RandomUserAgentMiddleware': 560,
         },
         'ITEM_PIPELINES': {
-            'ZhihuRank.pipelines.MongoSnapshotPipeline': 300,
+            'ZhihuRank.pipelines.PushRedis': 300,
+            'ZhihuRank.pipelines.MongoSnapshotPipeline': 310,
         }
     }
 
     def __init__(self):
-        self.reds = redis.from_url(settings.REDIS_URL, db=2, decode_responses=True)
-        init_url_token()
+        self.reds = redis.from_url(settings.REDIS_URL, db=3, decode_responses=True)
         super(MySpider, self).__init__()
 
     user_url = 'https://www.zhihu.com/api/v4/members/{url_token}?include={include}'
