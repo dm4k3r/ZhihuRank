@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class InserRedis(object):
     def __init__(self, mongo_uri, mongo_db):
-        self.reds = redis.Redis.from_url(REDIS_URL, db=2, decode_responses=True)
+        self.reds = redis.Redis.from_url(REDIS_URL, db=1, decode_responses=True)
         self.coon = pymongo.MongoClient(mongo_uri)
         self.db = self.coon[mongo_db]
         # 初始化已抓url_token队列

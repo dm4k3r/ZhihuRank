@@ -9,7 +9,7 @@ from scrapy import signals
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
 from fake_useragent import UserAgent
 from ZhihuRank.utils.cookie_redis import init_cookie
-from twisted.internet.error import TimeoutError, ConnectionRefusedError
+from twisted.internet.error import TimeoutError, ConnectError
 from twisted.web._newclient import ResponseNeverReceived
 from scrapy.exceptions import IgnoreRequest
 from datetime import datetime, timedelta
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class IngoreRequestMiddleware(object):
     def __init__(self, settings, crawler):
-        self.rcoon = redis.from_url(settings['REDIS_URL'], db=2, decode_responses=True)
+        self.rcoon = redis.from_url(settings['REDIS_URL'], db=1, decode_responses=True)
         self.redis_key = 'url_token'
 
     @classmethod
@@ -65,7 +65,7 @@ class CookieMiddleware(RetryMiddleware):
 
 class HttpProxyMiddleware(object):
     # 遇到这些类型的错误直接当做代理不可用处理掉, 不再传给retrymiddleware
-    DONT_RETRY_ERRORS = (TimeoutError, ConnectionRefusedError)
+    DONT_RETRY_ERRORS = (TimeoutError, ConnectError)
 
     def __init__(self, settings):
         # 从配置文件中中获取代理池服务器地址
@@ -73,13 +73,12 @@ class HttpProxyMiddleware(object):
         # 最后一次切换代理的时间
         self.last_proxy_time = datetime.now()
         # 代理模式切换时间，默认每3分钟切换一次
-        self.proxy_delay_tiem = 5
+        self.proxy_delay_tiem = 1
         # 切换代理状态
         self.proxy_status = False
         # 临时代理ip列表
         self.proxy_ip_list = []
         self.proxy_ip = ''
-        self.ban_ip = set()
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -101,7 +100,7 @@ class HttpProxyMiddleware(object):
                 break
             else:
                 logger.info('获取ip过快, 稍后重试')
-                time.sleep(random.randint(10, 20))
+                time.sleep(10)
 
 
     #  对当前请求设置代理，代理格式为http://ip:port
@@ -170,7 +169,7 @@ class HttpProxyMiddleware(object):
         """
         if isinstance(exception, self.DONT_RETRY_ERRORS):
             logger.info("处理异常url，并更换代理重试")
-            time.sleep(1)
+            time.sleep(10)
             self.set_proxy(request)
             self.last_proxy_time = datetime.now()
             new_request = request.copy()

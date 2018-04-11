@@ -12,7 +12,7 @@ class MySpider(RedisSpider):
     allowed_domains = 'zhihu.com'
     custom_settings = {
         'DOWNLOAD_DELAY': 2,
-        'CONCURRENT_REQUESTS': 32,
+        'CONCURRENT_REQUESTS': 16,
         'RETRY_ENABLED': False,
         'DOWNLOADER_MIDDLEWARES': {
             # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,
