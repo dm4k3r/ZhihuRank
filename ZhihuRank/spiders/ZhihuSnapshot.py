@@ -5,7 +5,6 @@ from datetime import datetime
 from ZhihuRank.items import ZhihuUserSnapshotItem, ZhihuUserItemLoader
 from ZhihuRank import settings
 import redis
-from ZhihuRank.utils.url_token_redis import init_url_token
 
 
 class MySpider(RedisSpider):

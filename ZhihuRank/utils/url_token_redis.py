@@ -5,15 +5,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-reds = redis.Redis.from_url(REDIS_URL, db=2, decode_responses=True)
+reds = redis.Redis.from_url('redis://root@35.229.240.163:6379', db=1, decode_responses=True)
 coon = pymongo.MongoClient(MONGO_URI)[MONGO_DATABASE]
+collection = coon['user']
+for i in collection.find({}, {'_id': 0, 'url_token': 1}):
+    print(('wrire to redis: ' + i['url_token']))
+    reds.hset('url_token', i['url_token'], 0)
 
-def init_url_token(collection='user'):
-    # 初始化已抓url_token队列
-    if reds.llen('url_token') == 0:
-        collection = coon[collection]
-        for i in collection.find({}, {'_id': 0, 'url_token': 1}):
-            reds.lpush('url_token', i['url_token'])
-        logger.info("初始化url_token完毕")
 
 

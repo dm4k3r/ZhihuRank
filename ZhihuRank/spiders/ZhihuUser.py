@@ -11,8 +11,8 @@ class MySpider(RedisSpider):
     redis_key = 'user:start_urls'
     allowed_domains = 'zhihu.com'
     custom_settings = {
-        'DOWNLOAD_DELAY': 2,
-        'CONCURRENT_REQUESTS': 16,
+        'DOWNLOAD_DELAY': 0.2,
+        'CONCURRENT_REQUESTS': 32,
         'RETRY_ENABLED': False,
         'DOWNLOADER_MIDDLEWARES': {
             # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,

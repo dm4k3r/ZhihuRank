@@ -71,7 +71,7 @@ class DropItemPipeline(object):
         follower_count = 0
         for i in item['follower_count'][0].keys():
             follower_count = item['follower_count'][0].get(i)
-        if follower_count <= 100:
+        if follower_count <= 15:
             raise DropItem("该号被关注人数过低: {0}".format(item['url_token']))
         return item
 
